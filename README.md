@@ -7,14 +7,14 @@ Installation
 ============
 
 ```
-TODO
+npm install atom-shell-pull --save
 ```
 
 Usage
 =====
 
 ```javascript
-var AtomShellDownload = require('./index');
+var AtomShellDownload = require('atom-shell-pull');
 
 var download = new AtomShellDownload({
     outputDir : 'atom-shell-binaries',
