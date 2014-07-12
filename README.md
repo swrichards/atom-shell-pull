@@ -14,15 +14,15 @@ Usage
 =====
 
 ```javascript
-var AtomShellDownload = require('atom-shell-pull');
+var AtomShellPull = require('atom-shell-pull');
 
-var download = new AtomShellDownload({
+var pull = new AtomShellPull({
     outputDir : 'atom-shell-binaries',
     // Available options are 'linux', 'win32' and 'darwin'
     platforms : ['linux', 'win32']
 });
 
-download.prepare(function (start) {
+pull.prepare(function (start) {
     start();
 });
 ```

@@ -16,7 +16,7 @@ module.exports = function (options) {
 
     self.prepare = function (readyCallback) {
         // Get an array of files to download.
-        console.log('Getting urls to release binaries.');
+        console.log('Getting urls to release binaries from the latest release.');
         var client = github.client();
         var repo = client.repo('atom/atom-shell');
         var releases = repo.releases(function (error, data, headers) {
@@ -40,6 +40,7 @@ module.exports = function (options) {
                 var foo = url.match(/ia32/);
 
                 // Also remove debugging symbols from the list.
+                // TODO: there should be an option to download these symbols.
                 var debug = url.match(/symbols/);
 
                 // Finally sort out the platform stuff.
@@ -82,9 +83,10 @@ module.exports = function (options) {
 
     self.downloadUrl = function (url, callback) {
         var fname = _.last(url.split('/'));
+        var outpath = path.join(self.outputDir, fname);
 
         // Check if we already have the file.
-        if (fs.existsSync(path.join(self.outputDir, fname))) {
+        if (fs.existsSync(outpath)) {
             console.log(fname + ' is already downloaded!');
             callback();
             return;
@@ -97,6 +99,12 @@ module.exports = function (options) {
             total : 100
         });
 
+        // This has a few issues.
+        // * It won't run on Windows (unless they've got Cygwin or something).
+        // * Error messages are ignored because we're only looking for percentages.
+        // * Because of the above point, bad things can happen silently.
+        // ~> We could perhaps use Http.get from node core.
+        // ~> Or stick with this until it breaks on someone. (Sorry to you).
         var download = spawn('wget', [url, '-P', self.outputDir]);
         var logProgress = false;
 
@@ -122,7 +130,8 @@ module.exports = function (options) {
         });
 
         download.on('close', function (code) {
-            console.log('Done (Status: ' + code + ') - moving on.');
+            var status = code === 0 ? 'good' : 'error';
+            console.log('Done (Status: ' + status + ') - moving on.');
             callback();
         });
     };

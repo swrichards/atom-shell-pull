@@ -1,10 +1,10 @@
-var AtomShellDownload = require('./index');
+var AtomShellPull = require('./index');
 
-var download = new AtomShellDownload({
+var pull = new AtomShellPull({
     outputDir : 'downloads',
     platforms : ['linux', 'win32'] // Available options are 'linux', 'win32' and 'darwin'
 });
 
-download.prepare(function (start) {
+pull.prepare(function (start) {
     start();
 });
