@@ -23,7 +23,6 @@
     "octonode": "0.6.x",
     "lodash": "2.4.x",
     "progress": "1.1.x",
-    "mkdirp": "0.5.x",
     "decompress-zip": "0.0.x"
   }
 }

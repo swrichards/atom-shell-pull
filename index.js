@@ -6,7 +6,6 @@ var github = require('octonode');
 var _ = require('lodash');
 var ProgressBar = require('progress');
 var DecompressZip = require('decompress-zip');
-var mkdirp = require('mkdirp');
 
 module.exports = function (options) {
     var self = this;
@@ -18,9 +17,6 @@ module.exports = function (options) {
 
     // Array of files that need to be downloaded.
     self.toDownload = [];
-
-    // Array of files that have been extracted.
-    self.handledFiles = [];
 
     self.prepare = function (readyCallback) {
         // Get an array of files to download.

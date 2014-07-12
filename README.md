@@ -33,5 +33,9 @@ Changes
 =======
 
 ###0.0.2 (Unreleased)
+- Started the changes log.
 - Implemented extracting of the downloaded zip files.
 - Remove some unnecessary dependencies and variables.
+
+###0.0.1 (2014-07-12)
+- Initial version. :octocat:
