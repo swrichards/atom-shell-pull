@@ -1,11 +1,30 @@
 atom-shell-pull
 ===============
 
-Download the atom-shell for multiple platforms. Useful for build scripts.
+> Download the atom-shell for multiple platforms. Useful for build scripts.
+
+Installation
+============
+
+```
+TODO
+```
 
 Usage
 =====
 
-See `test.js` for everything this module will do.
+```javascript
+var AtomShellDownload = require('./index');
+
+var download = new AtomShellDownload({
+    outputDir : 'atom-shell-binaries',
+    // Available options are 'linux', 'win32' and 'darwin'
+    platforms : ['linux', 'win32']
+});
+
+download.prepare(function (start) {
+    start();
+});
+```
 
 Made with :heart: by Nathan McCallum under the MIT license!

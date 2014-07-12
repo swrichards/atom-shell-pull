@@ -1,10 +1,13 @@
 {
   "name": "atom-shell-pull",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Download the atom-shell for multiple platforms. Useful for build scripts.",
-  "main": "index.js",
+  "main" : "index.js",
   "scripts": {
-    "test": "test.js"
+    "test": "node test.js"
+  },
+  "engines" : {
+    "node" : ">=0.4.0"
   },
   "repository": {
     "type": "git",
@@ -19,7 +22,6 @@
   "dependencies": {
     "octonode": "0.6.x",
     "lodash": "2.4.x",
-    "download": "^0.1.18",
-    "wget": "0.0.1"
+    "progress": "1.1.x"
   }
 }

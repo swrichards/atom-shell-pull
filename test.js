@@ -1,14 +1,10 @@
-var ShellDownload = require('./index');
+var AtomShellDownload = require('./index');
 
-var path = require('path');
-
-var output = path.join(__dirname, 'downloads');
-
-var download = new ShellDownload({
-    outputDir : output,
-    platforms : ['linux'] // Available options are 'linux', 'win32' and 'darwin'
+var download = new AtomShellDownload({
+    outputDir : 'downloads',
+    platforms : ['linux', 'win32'] // Available options are 'linux', 'win32' and 'darwin'
 });
 
-download.prepare(function () {
-    this.start();
+download.prepare(function (start) {
+    start();
 });

@@ -1,8 +1,10 @@
 var path = require('path');
+var spawn = require('child_process').spawn;
+var fs = require('fs');
 
 var github = require('octonode');
 var _ = require('lodash');
-var spawn = require('child_process').spawn;
+var ProgressBar = require('progress');
 
 module.exports = function (options) {
     var self = this;
@@ -24,7 +26,7 @@ module.exports = function (options) {
             }));
 
             self.toDownload = self.getUrlsForPlatforms(latest.assets);
-            readyCallback.call(self);
+            readyCallback.call(self, self.start);
         });
     },
 
@@ -64,30 +66,64 @@ module.exports = function (options) {
         // Start downloading files.
         console.log('Starting to download for platforms: ' + self.platforms.join(', '));
 
-        // var download = wget.download(_.first(self.toDownload), self.outputDir, {});
-        // download.on('error', function (error) {
-        //     console.log(error);
-        // });
+        function nextPlatform() {
+            var popped = self.toDownload.pop();
 
-        // download.on('end', function (output) {
-        //     console.log(output);
-        // });
+            if (popped) {
+                self.downloadUrl(popped, nextPlatform);
+            } else {
+                console.log('Finished!');
+                process.exit(0);
+            }
+        }
 
-        // download.on('progress', function (progress) {
-        //     console.log(progress);
-        // });
-
-        // This is unsafe - yolo!
-        var download = spawn('wget', [_.first(self.toDownload), '-P', self.outputDir]);
-        // For some reason all the status updates are sent to stderr.
-        download.stderr.on('data', function (data) {
-            // Find the percent values and put 'em into our progress bar.
-            // TODO!
-            // .. 37%
-        });
-        download.on('close', function (code) {
-            console.log('Download ended with code ' + code);
-        });
+        nextPlatform();
     };
 
+    self.downloadUrl = function (url, callback) {
+        var fname = _.last(url.split('/'));
+
+        // Check if we already have the file.
+        if (fs.existsSync(path.join(self.outputDir, fname))) {
+            console.log(fname + ' is already downloaded!');
+            callback();
+            return;
+        }
+
+        console.log('Downloading ' + fname);
+        console.log(); // some space for the bar.
+
+        var bar = new ProgressBar('Downloading [:bar] :percent - elapsed: :elapsed s', {
+            total : 100
+        });
+
+        var download = spawn('wget', [url, '-P', self.outputDir]);
+        var logProgress = false;
+
+        download.stderr.on('data', function (data) { // wget outputs to stderr
+            data = data.toString();
+
+            // wget logs out some stuff about following 302's. Need to try and ignore
+            // this. The last message before the percentages start is 'Saving to:'.
+            if (!logProgress) {
+                var match = data.match(/saving to: \S+/i);
+
+                if (match) {
+                    logProgress = true;
+                }
+            } else {
+                var match = data.match(/\d+%/);
+                var percent = parseInt(_.first(match), 10) / 100 || 0;
+
+                if (percent && !isNaN(percent)) {
+                    bar.update(percent);
+                }
+            }
+        });
+
+        download.on('close', function (code) {
+            console.log('Done (Status: ' + code + ') - moving on.');
+            callback();
+        });
+    };
 }
