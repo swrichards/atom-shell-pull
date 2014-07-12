@@ -3,6 +3,8 @@ atom-shell-pull
 
 > Download the atom-shell for multiple platforms. Useful for build scripts.
 
+Made with :heart: by Nathan McCallum under the MIT license!
+
 Installation
 ============
 
@@ -27,4 +29,9 @@ pull.prepare(function (start) {
 });
 ```
 
-Made with :heart: by Nathan McCallum under the MIT license!
+Changes
+=======
+
+###0.0.2 (Unreleased)
+- Implemented extracting of the downloaded zip files.
+- Remove some unnecessary dependencies and variables.
