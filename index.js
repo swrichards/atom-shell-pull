@@ -5,14 +5,22 @@ var fs = require('fs');
 var github = require('octonode');
 var _ = require('lodash');
 var ProgressBar = require('progress');
+var DecompressZip = require('decompress-zip');
+var mkdirp = require('mkdirp');
 
 module.exports = function (options) {
     var self = this;
 
+    options = options || {};
     self.version = options.version;
     self.platforms = options.platforms;
     self.outputDir = path.resolve(options.outputDir);
+
+    // Array of files that need to be downloaded.
     self.toDownload = [];
+
+    // Array of files that have been extracted.
+    self.handledFiles = [];
 
     self.prepare = function (readyCallback) {
         // Get an array of files to download.
@@ -73,8 +81,7 @@ module.exports = function (options) {
             if (popped) {
                 self.downloadUrl(popped, nextPlatform);
             } else {
-                console.log('Finished!');
-                process.exit(0);
+                return;
             }
         }
 
@@ -88,6 +95,7 @@ module.exports = function (options) {
         // Check if we already have the file.
         if (fs.existsSync(outpath)) {
             console.log(fname + ' is already downloaded!');
+            self.extract(fname, outpath)
             callback();
             return;
         }
@@ -132,7 +140,39 @@ module.exports = function (options) {
         download.on('close', function (code) {
             var status = code === 0 ? 'good' : 'error';
             console.log('Done (Status: ' + status + ') - moving on.');
+            self.extract(fname, outpath);
             callback();
         });
+    };
+
+    self.extract = function (fname, zipPath) {
+        console.log('Extracting ' + fname);
+
+        var extractPath = path.join(self.outputDir, self.removeExt(fname));
+
+        // Do that dirty deed!
+        var unzipper = new DecompressZip(zipPath)
+            .on('extract', function (log) {
+                console.log('Extracted ' + fname);
+            }).on('error', function (error) {
+                console.log('ERR: ' + error);
+            }).extract({
+                path : extractPath,
+                follow : false,
+                filter : function (file) {
+                    return file.type !== 'SymbolicLink';
+                }
+            });
+    };
+
+    self.removeExt = function (name) {
+        // Remove stuff from name.
+        return name
+            // .zip
+            .replace(/\.zip$/, '')
+            // -ia32
+            .replace(/\-ia32$/, '')
+            // atom-shell-v0.13.3
+            .replace(/^atom\-shell\-v\d+\.\d+\.\d+\-/, '');
     };
 }
