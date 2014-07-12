@@ -32,7 +32,7 @@ pull.prepare(function (start) {
 Changes
 =======
 
-###0.0.2 (Unreleased)
+###0.1.0 (2014-07-13)
 - Started the changes log.
 - Implemented extracting of the downloaded zip files.
 - Remove some unnecessary dependencies and variables.
