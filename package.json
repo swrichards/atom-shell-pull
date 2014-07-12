@@ -18,6 +18,8 @@
   "homepage": "https://github.com/Vasari/atom-shell-pull",
   "dependencies": {
     "octonode": "0.6.x",
-    "lodash": "2.4.x"
+    "lodash": "2.4.x",
+    "download": "^0.1.18",
+    "wget": "0.0.1"
   }
 }
