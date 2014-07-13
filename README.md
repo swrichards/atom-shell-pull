@@ -35,11 +35,14 @@ pull.prepare(function (start) {
 Changes
 =======
 
+###0.2.0 (Unreleased)
+- Can now download 32 or 64 bit binaries - or both.
+- Documentation fixes.
+
 ###0.1.0 (2014-07-13)
 - Started the changes log.
 - Implemented extracting of the downloaded zip files.
 - Remove some unnecessary dependencies and variables.
-- Can now download 32 or 64 bit binaries - or both.
 
 ###0.0.1 (2014-07-12)
 - Initial version. :octocat:
