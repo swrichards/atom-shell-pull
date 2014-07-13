@@ -11,9 +11,10 @@ module.exports = function (options) {
     var self = this;
 
     options = options || {};
-    self.version = options.version;
     self.platforms = options.platforms;
     self.outputDir = path.resolve(options.outputDir);
+
+    self.bits = options.bits || [];
 
     // Array of files that need to be downloaded.
     self.toDownload = [];
@@ -30,6 +31,7 @@ module.exports = function (options) {
             }));
 
             self.toDownload = self.getUrlsForPlatforms(latest.assets);
+            console.log(self.toDownload.join("\n"));
             readyCallback.call(self, self.start);
         });
     },
@@ -40,8 +42,9 @@ module.exports = function (options) {
 
             .filter(function (url) {
 
-                // 32 bit should work on 32 and 64. If you want 64 bit, send an issue. :)
-                var foo = url.match(/ia32/);
+                var correctBit =
+                    (_.contains(self.bits, 32) && !!url.match(/ia32/)) ||
+                    (_.contains(self.bits, 64) && !!url.match(/x64/));
 
                 // Also remove debugging symbols from the list.
                 // TODO: there should be an option to download these symbols.
@@ -57,7 +60,7 @@ module.exports = function (options) {
                     }
                 });
 
-                return foo && !debug && matchesPlatform;
+                return correctBit && !debug && matchesPlatform;
             })
             .value();
     };
@@ -166,8 +169,10 @@ module.exports = function (options) {
         return name
             // .zip
             .replace(/\.zip$/, '')
-            // -ia32
-            .replace(/\-ia32$/, '')
+            // ia32 => 32
+            .replace(/ia32$/, '32')
+            // x64 => 64
+            .replace(/x64$/, '64')
             // atom-shell-v0.13.3
             .replace(/^atom\-shell\-v\d+\.\d+\.\d+\-/, '');
     };
