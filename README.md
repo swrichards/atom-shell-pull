@@ -9,7 +9,7 @@ Installation
 ============
 
 ```
-npm install atom-shell-pull --save
+npm install atom-shell-pull --save-dev
 ```
 
 Usage
