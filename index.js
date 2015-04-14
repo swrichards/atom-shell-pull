@@ -19,6 +19,9 @@ module.exports = function (options) {
     // Array of files that need to be downloaded.
     self.toDownload = [];
 
+    // Completion callback to aid async task management, e.g. in gulp/grunt
+    self.onComplete = options.onComplete || undefined;
+
     self.prepare = function (readyCallback) {
         // Get an array of files to download.
         console.log('Getting urls to release binaries from the latest release.');
@@ -80,6 +83,8 @@ module.exports = function (options) {
             if (popped) {
                 self.downloadUrl(popped, nextPlatform);
             } else {
+                // No more downloads remaining, call completion handler
+                self.onComplete();
                 return;
             }
         }
@@ -94,8 +99,7 @@ module.exports = function (options) {
         // Check if we already have the file.
         if (fs.existsSync(outpath)) {
             console.log(fname + ' is already downloaded!');
-            self.extract(fname, outpath)
-            callback();
+            self.extract(fname, outpath, callback)
             return;
         }
 
@@ -139,12 +143,11 @@ module.exports = function (options) {
         download.on('close', function (code) {
             var status = code === 0 ? 'good' : 'error';
             console.log('Done (Status: ' + status + ') - moving on.');
-            self.extract(fname, outpath);
-            callback();
+            self.extract(fname, outpath, callback);
         });
     };
 
-    self.extract = function (fname, zipPath) {
+    self.extract = function (fname, zipPath, complete) {
         console.log('Extracting ' + fname);
 
         var extractPath = path.join(self.outputDir, self.removeExt(fname));
@@ -153,6 +156,7 @@ module.exports = function (options) {
         var unzipper = new DecompressZip(zipPath)
             .on('extract', function (log) {
                 console.log('Extracted ' + fname);
+                if (_.isFunction(complete)) complete.call(this);
             }).on('error', function (error) {
                 console.log('ERR: ' + error);
             }).extract({
